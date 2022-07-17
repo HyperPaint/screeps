@@ -1,32 +1,32 @@
 let config = {
 
 	/*
-	 * Роли колонии
+	 * Р РѕР»Рё РєРѕР»РѕРЅРёРё
 	 */
 	roles: {
-		// нет типа
+		// РЅРµС‚ С‚РёРїР°
 		none: 'none',
-		// добывает
+		// РґРѕР±С‹РІР°РµС‚
 		harvester: 'harvester',
 		harvesterBig: 'harvester_big',
-		// улучшает
+		// СѓР»СѓС‡С€Р°РµС‚
 		upgrader: 'upgrader',
-		// строит
+		// СЃС‚СЂРѕРёС‚
 		builder: 'builder',
-		// чинит
+		// С‡РёРЅРёС‚
 		repairer: 'repairer',
-		// добывает на чужой территории
+		// РґРѕР±С‹РІР°РµС‚ РЅР° С‡СѓР¶РѕР№ С‚РµСЂСЂРёС‚РѕСЂРёРё
 		robber: 'robber',
-		// защищает
+		// Р·Р°С‰РёС‰Р°РµС‚
 		security_melee: 'security_melee',
 		security_range: 'security_range',
-		// атакует
+		// Р°С‚Р°РєСѓРµС‚
 		soldier_melee: 'soldier_melee',
 		soldier_range: 'soldier_range',
 	},
 
 	/*
-	 * Уровни колонии
+	 * РЈСЂРѕРІРЅРё РєРѕР»РѕРЅРёРё
 	 */
 	level_1: {
 		harvester_count: 1,
@@ -42,7 +42,7 @@ let config = {
 	},
 	
 	level_2: {
-		harvester_count: 1,
+		harvester_count: 2,
 		harvester_big_count: 0,
 		upgrader_count: 2,
 		builder_count: 1,
@@ -55,10 +55,10 @@ let config = {
 	},
 	
 	level_3: {
-		harvester_count: 1,
+		harvester_count: 2,
 		harvester_big_count: 0,
 		upgrader_count: 2,
-		builder_count: 1,
+		builder_count: 2,
 		repairer_count: 1,
 		robber_count: 0,
 		security_melee_count: 0,

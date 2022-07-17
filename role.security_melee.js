@@ -2,7 +2,7 @@ let config = require('_config');
 
 let roleSecurityMelee = {
 	run: function (creep) {
-		// работа
+		// пїЅпїЅпїЅпїЅпїЅпїЅ
 		if (creep.memory.full) {
 			let targets = creep.room.find(FIND_HOSTILE_CREEPS);
 			targets.sort();

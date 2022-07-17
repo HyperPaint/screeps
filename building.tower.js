@@ -1,16 +1,16 @@
 let buildingTower = {
 	run: function (tower) {
-		// работа
+		// пїЅпїЅпїЅпїЅпїЅпїЅ
 		if (tower.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
 			let targets;
-			// атака
+			// пїЅпїЅпїЅпїЅпїЅ
 			targets = tower.room.find(FIND_HOSTILE_CREEPS);
 			if (targets.length) {
 				if (tower.attack(targets[0])) {
 					return;
                 }
 			}
-			// починка
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			targets = tower.room.find(FIND_STRUCTURES, {
 				filter: object => {
 					switch (object.structureType) {
