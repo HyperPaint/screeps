@@ -17,7 +17,7 @@ Game.creeps['Harvester1'].suicide()
 Game.creeps['Harvester1'].memory.role = 'harvester';
 Game.creeps['Upgrader1'].memory.role = 'upgrader';
 
-### Активировать режим безопасности
+### Активировать безопасный режим
 Game.spawns['Spawn1'].room.controller.activateSafeMode();
 
 ### Разместить постройку
