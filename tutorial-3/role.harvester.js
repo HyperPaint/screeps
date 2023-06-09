@@ -1,4 +1,5 @@
-module.exports = {
+var roleHarvester = {
+
     /** @param {Creep} creep **/
     run: function(creep) {
 	    if(creep.store.getFreeCapacity() > 0) {
@@ -22,3 +23,5 @@ module.exports = {
         }
 	}
 }
+
+module.exports = roleHarvester;
