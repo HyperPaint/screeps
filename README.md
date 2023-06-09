@@ -16,3 +16,9 @@ Game.creeps['Harvester1'].suicide()
 ### Записать в память
 Game.creeps['Harvester1'].memory.role = 'harvester';
 Game.creeps['Upgrader1'].memory.role = 'upgrader';
+
+### Активировать режим безопасности
+Game.spawns['Spawn1'].room.controller.activateSafeMode();
+
+### Разместить постройку
+Game.spawns['Spawn1'].room.createConstructionSite( 23, 22, STRUCTURE_TOWER );
