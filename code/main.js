@@ -1,4 +1,5 @@
 const otherConstants = require("./other.constants");
+const roleCreepBuilder = require("./role.creep.builder");
 const roleCreepHarvester = require("./role.creep.harvester");
 const roleCreepUpgrader = require("./role.creep.upgrader");
 const roleStructureSpawn = require("./role.structure.spawn");
@@ -11,6 +12,8 @@ function main() {
             roleCreepHarvester.process(creep);
         } else if (creep.memory.role == otherConstants.roleNames.upgrader) { // Улучшатель
             roleCreepUpgrader.process(creep);
+        } else if (creep.memory.role == otherConstants.roleNames.builder) { // Строитель
+            roleCreepBuilder.process(creep);
         }
     }
 

@@ -1,3 +1,4 @@
+const roleCreepBuilder = require("./role.creep.builder");
 const roleCreepHarvester = require("./role.creep.harvester");
 const roleCreepUpgrader = require("./role.creep.upgrader");
 const otherConstants = require("./other.constants");
@@ -16,9 +17,11 @@ const roleStructureSpawn = {
         } else {
             // Иначе попытаться поставить в очередь задачи
             if (!this.check(otherConstants.roleNames.harvester, this.getEpoch(spawn).creepCounts.harvester)) { // Добытчик
-                this.spawn(spawn, otherConstants.epochs[0].creepBodies.harvester, otherConstants.roleCreepNames.harvester(), roleCreepHarvester.initialMemory(spawn));
-            } else if (!this.check(otherConstants.roleNames.upgrader, otherConstants.epochs[0].creepCounts.upgrader)) { // Улучшатель
-                this.spawn(spawn, otherConstants.epochs[0].creepBodies.upgrader, otherConstants.roleCreepNames.upgrader(), roleCreepUpgrader.initialMemory(spawn));
+                this.spawn(spawn, this.getEpoch(spawn).creepBodies.harvester, otherConstants.roleCreepNames.harvester(), roleCreepHarvester.initialMemory(spawn));
+            } else if (!this.check(otherConstants.roleNames.upgrader, this.getEpoch(spawn).creepCounts.upgrader)) { // Улучшатель
+                this.spawn(spawn, this.getEpoch(spawn).creepBodies.upgrader, otherConstants.roleCreepNames.upgrader(), roleCreepUpgrader.initialMemory(spawn));
+            } else if (!this.check(otherConstants.roleNames.builder, this.getEpoch(spawn).creepCounts.builder)) { // Строитель
+                this.spawn(spawn, this.getEpoch(spawn).creepBodies.builder, otherConstants.roleCreepNames.builder(), roleCreepBuilder.initialMemory(spawn));
             }
         }
     },
@@ -30,7 +33,7 @@ const roleStructureSpawn = {
      * @return {Epoch} Возвращает объект эпохи соответствующий текущему развитию.
      */
     getEpoch: (spawn) => {
-        return otherConstants.epochs[0];
+        return otherConstants.epochs[1];
     },
 
     /**

@@ -12,6 +12,7 @@ const otherConstants = {
      * @typedef {Object} CreepBodies 
      * @property {Number[]} harvester Тело добытчика.
      * @property {Number[]} upgrader Тело улучшателя.
+     * @property {Number[]} builder Тело строителя.
      */
 
     /**
@@ -19,6 +20,7 @@ const otherConstants = {
      * @typedef {Object} CreepCounts 
      * @property {Number} harvester Количество добытчиков.
      * @property {Number} upgrader Количество улучшателей.
+     * @property {Number} builder Количество строителей.
      */
 
     /**
@@ -38,12 +40,13 @@ const otherConstants = {
         {
             creepBodies: {
                 harvester: [WORK, CARRY, MOVE, MOVE],
-                upgrader: [WORK, CARRY, MOVE, MOVE],
+                upgrader: [WORK, CARRY, CARRY, MOVE],
             },
 
             creepCounts: {
                 harvester: 1,
                 upgrader: 2,
+                builder: 0,
             },
 
             energyMeasurementError: {
@@ -56,12 +59,14 @@ const otherConstants = {
         { 
             creepBodies: {
                 harvester: [WORK, CARRY, MOVE, MOVE],
-                upgrader: [WORK, CARRY, MOVE, MOVE],
+                upgrader: [WORK, CARRY, CARRY, MOVE],
+                builder: [WORK, CARRY, CARRY, MOVE],
             },
 
             creepCounts: {
                 harvester: 1,
                 upgrader: 2,
+                builder: 2,
             },
 
             energyMeasurementError: {
@@ -87,6 +92,12 @@ const otherConstants = {
          * @type {String}
          */
         upgrader: "upgrader",
+
+        /**
+         * Строитель
+         * @type {String}
+         */
+        builder: "builder",
     },
 
     /**
@@ -105,6 +116,12 @@ const otherConstants = {
          * @returns {String}
          */
         upgrader: () => "Upgrader-" + otherConstants.roleCreepNames._time(),
+
+        /**
+         * Строитель
+         * @returns {String}
+         */
+        builder: () => "Builder-" + otherConstants.roleCreepNames._time(),
 
         /**
          * Специальная функция для вычисления 'уникального' значения для наименований.
