@@ -2,14 +2,14 @@ const otherConstants = {
     /**
      * Объект представляющий эпоху.
      * @typedef {Object} Epoch
-     * @property {CreepBodies} creepBodies Коллекция тел крипов для разных ролей.
-     * @property {CreepCounts} creepCounts Коллекция заявленного количества крипов для разных ролей.
+     * @property {CreepsBodies} creepsBodies Коллекция тел крипов для разных ролей.
+     * @property {CreepsCounts} creepsCounts Коллекция заявленного количества крипов для разных ролей.
      * @property {EnergyMeasurementError} energyMeasurementError Коллекция ошибок при измерении энергии для разных хранилищ.
      */
 
     /**
      * Коллекция тел крипов для разных ролей.
-     * @typedef {Object} CreepBodies 
+     * @typedef {Object} CreepsBodies 
      * @property {Number[]} harvester Тело добытчика.
      * @property {Number[]} upgrader Тело улучшателя.
      * @property {Number[]} builder Тело строителя.
@@ -17,7 +17,7 @@ const otherConstants = {
 
     /**
      * Коллекция заявленного количества крипов для разных ролей.
-     * @typedef {Object} CreepCounts 
+     * @typedef {Object} CreepsCounts 
      * @property {Number} harvester Количество добытчиков.
      * @property {Number} upgrader Количество улучшателей.
      * @property {Number} builder Количество строителей.
@@ -38,12 +38,12 @@ const otherConstants = {
     epochs: [
         // 0
         {
-            creepBodies: {
+            creepsBodies: {
                 harvester: [WORK, CARRY, MOVE, MOVE],
                 upgrader: [WORK, CARRY, CARRY, MOVE],
             },
 
-            creepCounts: {
+            creepsCounts: {
                 harvester: 1,
                 upgrader: 2,
                 builder: 0,
@@ -57,13 +57,13 @@ const otherConstants = {
 
         // 1
         { 
-            creepBodies: {
+            creepsBodies: {
                 harvester: [WORK, CARRY, MOVE, MOVE],
                 upgrader: [WORK, CARRY, CARRY, MOVE],
                 builder: [WORK, CARRY, CARRY, MOVE],
             },
 
-            creepCounts: {
+            creepsCounts: {
                 harvester: 1,
                 upgrader: 2,
                 builder: 2,
