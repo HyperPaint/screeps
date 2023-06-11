@@ -5,7 +5,8 @@ const otherConstantsStrings = {
      * @type {CollectionStrings}
      */
     creep: {
-
+        cant: "Не могу!",
+        error: "Ошибка!",
     },
 
     /**

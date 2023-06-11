@@ -1,5 +1,8 @@
-const constants = require("./other.constants");
+const otherConstants = require("./other.constants");
+const otherConstantsErrors = require("./other.constants.errors");
+const otherConstantsStrings = require("./other.constants.strings");
 const otherVisual = require("./other.visual");
+const roleStaticEpoch = require("./role.static.epoch");
 
 module.exports = {
     /**
@@ -9,14 +12,14 @@ module.exports = {
      */
     process: function(creep) {
         // Если есть свободное место
-	    if(creep.store.getFreeCapacity(RESOURCE_ENERGY)) {
+        if (creep.store.getFreeCapacity(RESOURCE_ENERGY)) {
             this.harvest(creep, Game.getObjectById(creep.memory.sourceId));
-        // Если свободного места нет
+            // Если свободного места нет
         } else {
             this.store(creep);
         }
-	},
-    
+    },
+
     /**
      * Функция вернёт один из ID источников энергии, которые крип в будущем будет пытаться добывать.
      * @param {Room} room Комната, в которой требуется выбрать источник
@@ -26,7 +29,7 @@ module.exports = {
     initialSource: function(room, counter) {
         // Память источников, если не создана
         if (room.memory.sources == undefined) {
-            room.memory.sources = { };
+            room.memory.sources = {};
         }
         // Память количества источников, если не создана
         if (room.memory.sources.count == undefined) {
@@ -60,13 +63,13 @@ module.exports = {
     initialMemory: function(spawn) {
         // Память роли, если не создана
         if (spawn.room.memory.harvesters == undefined) {
-            spawn.room.memory.harvesters = { };
+            spawn.room.memory.harvesters = {};
         }
         // Счётчик роли, если не создан
         if (spawn.room.memory.harvesters.counter == undefined) {
             spawn.room.memory.harvesters.counter = 0;
         }
-        return { role: constants.roleNames.harvester, sourceId: this.initialSource(spawn.room, spawn.room.memory.harvesters.counter++) };
+        return { role: otherConstants.roleNames.harvester, sourceId: this.initialSource(spawn.room, spawn.room.memory.harvesters.counter++) };
     },
 
     /**
@@ -75,60 +78,29 @@ module.exports = {
      * @param {Source} source Источник энергии
      */
     harvest: function(creep, source) {
-        // Добывать
         let result = creep.harvest(source);
         switch (result) {
-            // The operation has been scheduled successfully
             case OK:
                 otherVisual.setSuccess(creep.room.visual, source.pos);
-                break;
-            
-            // You are not the owner of this creep, or the room controller is owned or reserved by another player
-            case ERR_NOT_OWNER:
-                console.log("Крип " + creep.name + " или контроллер не принадлежат тебе");
-                break;
 
-            // The creep is still being spawned
             case ERR_BUSY:
-                break;
-            
-            // Extractor not found. You must build an extractor structure to harvest minerals
-            case ERR_NOT_FOUND:
-                creep.say("Не нашел");
-                otherVisual.setError(creep.room.visual, source.pos);
+                // Игнорировать
                 break;
 
-            // The target does not contain any harvestable energy or mineral
-            case ERR_NOT_ENOUGH_RESOURCES:
-                creep.say("Пусто");
-                otherVisual.setError(creep.room.visual, source.pos);
-                break;
-
-            // The target is not a valid source or mineral object
-            case ERR_INVALID_TARGET:
-                creep.say("Не нашел");
-                otherVisual.setError(creep.room.visual, source.pos);
-                break;
-
-            // The target is too far away
             case ERR_NOT_IN_RANGE:
                 creep.moveTo(source);
                 break;
 
-            // The extractor or the deposit is still cooling down
-            case ERR_TIRED:
-                creep.say("Кулдаун");
+            case ERR_NOT_ENOUGH_RESOURCES:
+                creep.say(otherConstantsStrings.creep.cant);
                 otherVisual.setError(creep.room.visual, source.pos);
                 break;
 
-            // There are no WORK body parts in this creep's body
-            case ERR_NO_BODYPART:
-                creep.say("Нет WORK");
-                otherVisual.setError(creep.room.visual, creep.pos);
-                break;
-
             default:
-                console.log("Не удалось добыть источник, код ошибки " + result);
+                console.log("Добыча источника " + source.id + " крипом " + creep.name + " не удалась, код ошибки " + otherConstantsErrors.errorCodeToText(result));
+                creep.say(otherConstantsStrings.creep.error);
+                otherVisual.setError(creep.room.visual, creep.pos);
+                otherVisual.setError(creep.room.visual, source.pos);
                 break;
         }
     },
@@ -138,75 +110,75 @@ module.exports = {
      * @param {Creep} creep Крип, который будет добывать
      */
     harvestClosest: function(creep) {
-        // Найти источники энергии
         let sources = creep.room.find(FIND_SOURCES_ACTIVE);
         if (sources.length) {
-            // Найти ближний
-            let source = creep.pos.findClosestByPath(sources);
+            let source = creep.pos.findClosestByRange(sources);
             this.harvest(creep, source);
         } else {
-            creep.say("Не нашел");
+            creep.say(otherConstantsStrings.creep.cant);
+            otherVisual.setError(creep.room.visual, creep.pos);
         }
     },
 
     /**
-     * Сложить энергию на спавн
-     * @param {Creep} creep Крип, который будет складывать
+     * Сложить энергию в хранилище.
+     * @param {Creep} creep Крип, который будет складывать.
+     * @param {Store} target Хранилище, в которое будут складывать.
+     * @returns {Boolean} Возвращает true, если удалось сложить. Возвращает false, если не удалось.
+     */
+    _store: function(creep, target) {
+        let result = creep.transfer(target, RESOURCE_ENERGY);
+        switch (result) {
+            case ERR_NOT_IN_RANGE:
+                creep.moveTo(target);
+                otherVisual.setSuccess(creep.room.visual, target.pos);
+                return true;
+
+            case ERR_BUSY:
+                return true;
+
+            default:
+                console.log("Складывание на " + target.id + " крипом " + creep.name + " не удалось, код ошибки " + otherConstantsErrors.errorCodeToText(result));
+                creep.say(otherConstantsStrings.creep.error);
+                otherVisual.setError(creep.room.visual, creep.pos);
+                otherVisual.setError(creep.room.visual, source.pos);
+                return false;
+        }
+    },
+
+    _storeTo: function(creep, findStructures, filterStructuresType) {
+        let structures = _.filter(creep.room.find(findStructures), (object) => object.structureType == filterStructuresType);
+        // Найти свободные
+        let notFilled = _.filter(structures, (object) => object.store.getFreeCapacity(RESOURCE_ENERGY) > roleStaticEpoch.getEpoch(creep.room).energyMeasurementError.extension);
+        if (notFilled.length) {
+            let target;
+            if (structures.length == 1) {
+                target = structures[0];
+            } else {
+                // Наиболее свободный
+                target = notFilled.reduce((prev, next) => prev.store.getFreeCapacity(RESOURCE_ENERGY) < next.store.getFreeCapacity(RESOURCE_ENERGY) ? next : prev);
+            }
+            return this._store(creep, target);
+        }
+        return false;
+    },
+
+    /**
+     * Сложить энергию на спавн.
+     * @param {Creep} creep Крип, который будет складывать.
      * @returns {Boolean} Возвращает true, если удалось сложить. Возвращает false, если не удалось.
      */
     storeToSpawn: function(creep) {
-        let structures = creep.room.find(FIND_MY_SPAWNS);
-        // Найти свободные
-        let notFilled = _.filter(structures, (object) => { return object.store.getFreeCapacity(RESOURCE_ENERGY) > constants.epochs[0].energyMeasurementError.spawn; } );
-        // Если есть свободные
-        if (notFilled.length) {
-            let target;
-            // Если один
-            if (structures.length == 1) {
-                target = structures[0];
-            // Если несколько
-            } else {
-                // Наиболее свободный
-                target = notFilled.reduce((prev, next) => prev.store.getFreeCapacity(RESOURCE_ENERGY) < next.store.getFreeCapacity(RESOURCE_ENERGY) ? next : prev);
-            }
-            // Отнести
-            if (creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
-                otherVisual.setSuccess(creep.room.visual, target.pos);
-            }
-            return true;
-        }
-        return false;
+        return _storeTo(creep, FIND_MY_SPAWNS, STRUCTURE_SPAWN);
     },
 
     /**
-     * Сложить энергию на расширение спавна
-     * @param {Creep} creep Крип, который будет складывать
+     * Сложить энергию на расширение спавна.
+     * @param {Creep} creep Крип, который будет складывать.
      * @returns {Boolean} Возвращает true, если удалось сложить. Возвращает false, если не удалось.
      */
     storeToExtension: function(creep) {
-        let structures = _.filter(creep.room.find(FIND_MY_STRUCTURES), (object) => { return object.structureType == STRUCTURE_EXTENSION } );
-        // Найти свободные
-        let notFilled = _.filter(structures, (object) => { return object.store.getFreeCapacity(RESOURCE_ENERGY) > constants.epochs[0].energyMeasurementError.extension; } );
-        // Если есть свободные
-        if (notFilled.length) {
-            let target;
-            // Если один
-            if (structures.length == 1) {
-                target = structures[0];
-            // Если несколько
-            } else {
-                // Наиболее свободный
-                target = notFilled.reduce((prev, next) => prev.store.getFreeCapacity(RESOURCE_ENERGY) < next.store.getFreeCapacity(RESOURCE_ENERGY) ? next : prev);
-            }
-            // Отнести
-            if (creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
-                otherVisual.setSuccess(creep.room.visual, target.pos);
-            }
-            return true;
-        }
-        return false;
+        return _storeTo(creep, FIND_MY_STRUCTURES, STRUCTURE_EXTENSION);
     },
 
     /**
@@ -215,13 +187,13 @@ module.exports = {
      */
     store: function(creep) {
         let result = this.storeToSpawn(creep);
-        if (! result) {
+        if (!result) {
             result = this.storeToExtension(creep);
         } else {
             return;
         }
-        
-        creep.say("Нет места");
+
+        creep.say(otherConstantsStrings.creep.cant);
         otherVisual.setError(creep.room.visual, creep.pos);
     },
 };

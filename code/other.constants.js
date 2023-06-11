@@ -106,6 +106,12 @@ const otherConstants = {
      */
     roleCreepNames: {
         /**
+         * Специальная функция для вычисления 'уникального' значения для наименований.
+         * @returns {String}
+         */
+        _time: () => (Game.time % 10000).toString(),
+
+        /**
          * Добытчик
          * @returns {String}
          */
@@ -122,12 +128,6 @@ const otherConstants = {
          * @returns {String}
          */
         builder: () => "Builder-" + otherConstants.roleCreepNames._time(),
-
-        /**
-         * Специальная функция для вычисления 'уникального' значения для наименований.
-         * @returns {String}
-         */
-        _time: () => (Game.time % 10000).toString(),
     },
 };
 

@@ -1,7 +1,10 @@
+const otherConstants = require("./other.constants");
+const otherConstantsErrors = require("./other.constants.errors");
+const otherConstantsStrings = require("./other.constants.strings");
 const roleCreepBuilder = require("./role.creep.builder");
 const roleCreepHarvester = require("./role.creep.harvester");
 const roleCreepUpgrader = require("./role.creep.upgrader");
-const otherConstants = require("./other.constants");
+const roleStaticEpoch = require("./role.static.epoch");
 
 const roleStructureSpawn = {
     /**
@@ -16,7 +19,7 @@ const roleStructureSpawn = {
             spawn.room.visual.text("🛠️" + creep.name + "🛠️", spawn.pos.x, spawn.pos.y + 1.5);
         } else {
             // Иначе попытаться поставить в очередь задачи
-            let currentEpoch = this.getEpoch(spawn), roleCreepName;
+            let currentEpoch = roleStaticEpoch.getEpoch(spawn.room), roleCreepName;
 
             // Добытчик
             if (!this.checkCreeps(otherConstants.roleNames.harvester, currentEpoch.creepsCounts.harvester)) {
@@ -45,16 +48,6 @@ const roleStructureSpawn = {
                 }
             }
         }
-    },
-
-    /**
-     * Функция для вычисления уровня развития текущей комнаты.
-     * Уровень развития вычисляется раз в несколько вызовов, обычно возвращается закэшированное значение.
-     * @param {StructureSpawn} spawn Спавн в комнате которого трубуется вычислить уровень развития.
-     * @return {Epoch} Возвращает объект эпохи соответствующий текущему развитию.
-     */
-    getEpoch: (spawn) => {
-        return otherConstants.epochs[1];
     },
 
     /**
@@ -87,8 +80,11 @@ const roleStructureSpawn = {
                 console.log("Проверка возможности создания крипа " + creepName + " пройдена");
                 return true;
 
+            case -6:
+                return false;
+
             default:
-                console.log("Проверка возможности создания крипа " + creepName + " не пройдена, код ошибки " + result);
+                console.log("Проверка возможности создания крипа " + creepName + " не пройдена, код ошибки " + otherConstantsErrors.errorCodeToText(result));
                 return false;
         }
     },
@@ -109,7 +105,7 @@ const roleStructureSpawn = {
                 break;
 
             default:
-                console.log("Создание крипа " + creepName + " запущено неуспешно, код ошибки " + result);
+                console.log("Создание крипа " + creepName + " запущено неуспешно, код ошибки " + otherConstantsErrors.errorCodeToText(result));
                 break;
         }
     },
