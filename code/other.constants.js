@@ -129,29 +129,6 @@ const otherConstants = {
          */
         _time: () => (Game.time % 10000).toString(),
     },
-
-    /**
-     * Коллекция содержащая все реплики крипов и сообщений для отправки в консоль.
-     * @type {Object}
-     */
-    strings: {
-        /**
-         * Реплики крипов.
-         * Ограничение 10 символов.
-         * @type {CollectionStrings}
-         */
-        creep: {
-
-        },
-
-        /**
-         * Шаблонные сообщения в консоль.
-         * @type {CollectionStrings}
-         */
-        console: {
-
-        },
-    },
 };
 
 module.exports = otherConstants;
