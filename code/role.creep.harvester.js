@@ -120,32 +120,6 @@ module.exports = {
         }
     },
 
-    /**
-     * Сложить энергию в хранилище.
-     * @param {Creep} creep Крип, который будет складывать.
-     * @param {Store} target Хранилище, в которое будут складывать.
-     * @returns {Boolean} Возвращает true, если удалось сложить. Возвращает false, если не удалось.
-     */
-    _store: function(creep, target) {
-        let result = creep.transfer(target, RESOURCE_ENERGY);
-        switch (result) {
-            case ERR_NOT_IN_RANGE:
-                creep.moveTo(target);
-                otherVisual.setSuccess(creep.room.visual, target.pos);
-                return true;
-
-            case ERR_BUSY:
-                return true;
-
-            default:
-                console.log("Складывание на " + target.id + " крипом " + creep.name + " не удалось, код ошибки " + otherConstantsErrors.errorCodeToText(result));
-                creep.say(otherConstantsStrings.creep.error);
-                otherVisual.setError(creep.room.visual, creep.pos);
-                otherVisual.setError(creep.room.visual, source.pos);
-                return false;
-        }
-    },
-
     _storeTo: function(creep, findStructures, filterStructuresType) {
         let structures = _.filter(creep.room.find(findStructures), (object) => object.structureType == filterStructuresType);
         // Найти свободные
@@ -158,7 +132,24 @@ module.exports = {
                 // Наиболее свободный
                 target = notFilled.reduce((prev, next) => prev.store.getFreeCapacity(RESOURCE_ENERGY) < next.store.getFreeCapacity(RESOURCE_ENERGY) ? next : prev);
             }
-            return this._store(creep, target);
+            let result = creep.transfer(target, RESOURCE_ENERGY);
+            switch (result) {
+                case ERR_NOT_IN_RANGE:
+                    creep.moveTo(target);
+                    otherVisual.setSuccess(creep.room.visual, target.pos);
+                    return true;
+
+                case OK:
+                case ERR_BUSY:
+                    return true;
+
+                default:
+                    console.log("Складывание на " + target.id + " крипом " + creep.name + " не удалось, код ошибки " + otherConstantsErrors.errorCodeToText(result));
+                    creep.say(otherConstantsStrings.creep.error);
+                    otherVisual.setError(creep.room.visual, creep.pos);
+                    otherVisual.setError(creep.room.visual, source.pos);
+                    return false;
+            }
         }
         return false;
     },
@@ -169,7 +160,7 @@ module.exports = {
      * @returns {Boolean} Возвращает true, если удалось сложить. Возвращает false, если не удалось.
      */
     storeToSpawn: function(creep) {
-        return _storeTo(creep, FIND_MY_SPAWNS, STRUCTURE_SPAWN);
+        return this._storeTo(creep, FIND_MY_SPAWNS, STRUCTURE_SPAWN);
     },
 
     /**
@@ -178,7 +169,7 @@ module.exports = {
      * @returns {Boolean} Возвращает true, если удалось сложить. Возвращает false, если не удалось.
      */
     storeToExtension: function(creep) {
-        return _storeTo(creep, FIND_MY_STRUCTURES, STRUCTURE_EXTENSION);
+        return this._storeTo(creep, FIND_MY_STRUCTURES, STRUCTURE_EXTENSION);
     },
 
     /**
