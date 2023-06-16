@@ -1,18 +1,19 @@
-const otherConstants = require("./other.constants");
 const roleCreepBuilder = require("./role.creep.builder");
 const roleCreepHarvester = require("./role.creep.harvester");
 const roleCreepUpgrader = require("./role.creep.upgrader");
 const roleStructureSpawn = require("./role.structure.spawn");
 
+const staticConstants = require("./static.constants");
+
 function main() {
     // Деятельность крипов
     for (let creepName in Game.creeps) {
         let creep = Game.creeps[creepName];
-        if (creep.memory.role == otherConstants.roleNames.harvester) { // Добытчик
+        if (creep.memory.role == staticConstants.roleNames.harvester) { // Добытчик
             roleCreepHarvester.process(creep);
-        } else if (creep.memory.role == otherConstants.roleNames.upgrader) { // Улучшатель
+        } else if (creep.memory.role == staticConstants.roleNames.upgrader) { // Улучшатель
             roleCreepUpgrader.process(creep);
-        } else if (creep.memory.role == otherConstants.roleNames.builder) { // Строитель
+        } else if (creep.memory.role == staticConstants.roleNames.builder) { // Строитель
             roleCreepBuilder.process(creep);
         }
     }

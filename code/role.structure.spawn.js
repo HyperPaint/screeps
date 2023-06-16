@@ -1,10 +1,10 @@
-const otherConstants = require("./other.constants");
-const otherConstantsErrors = require("./other.constants.errors");
-const otherConstantsStrings = require("./other.constants.strings");
+const libVisual = require("./lib.visual");
 const roleCreepBuilder = require("./role.creep.builder");
 const roleCreepHarvester = require("./role.creep.harvester");
 const roleCreepUpgrader = require("./role.creep.upgrader");
-const roleStaticEpoch = require("./role.static.epoch");
+const staticConstants = require("./static.constants");
+const staticEpoch = require("./static.epoch");
+const staticErrors = require("./static.errors");
 
 const roleStructureSpawn = {
     /**
@@ -15,35 +15,35 @@ const roleStructureSpawn = {
     process: function(spawn) {
         if (spawn.spawning) {
             // Если спавн работает, отобразить текст работы
-            let creep = spawn.spawning;
-            spawn.room.visual.text("🛠️" + creep.name + "🛠️", spawn.pos.x, spawn.pos.y + 1.5);
+            const creep = spawn.spawning;
+            libVisual.setSpawnWorking(creep.name, spawn.room.visual, spawn.pos);
         } else {
             // Иначе попытаться поставить в очередь задачи
-            let currentEpoch = roleStaticEpoch.getEpoch(spawn.room), roleCreepName;
+            let currentEpoch = staticEpoch.getEpoch(spawn.room), roleCreepName;
 
             // Добытчик
-            if (!this.checkCreeps(otherConstants.roleNames.harvester, currentEpoch.creepsCounts.harvester)) {
-                roleCreepName = otherConstants.roleCreepNames.harvester();
+            if (!this.checkCreeps(staticConstants.roleNames.harvester, currentEpoch.creepsCounts.harvester)) {
+                roleCreepName = staticConstants.roleCreepNames.harvester();
                 if (this.checkSpawn(spawn, currentEpoch.creepsBodies.harvester, roleCreepName)) {
-                    this.spawn(spawn, currentEpoch.creepsBodies.harvester, roleCreepName, roleCreepHarvester.initialMemory(spawn));
+                    this.spawn(spawn, currentEpoch.creepsBodies.harvester, roleCreepName, roleCreepHarvester.getInitialMemory(spawn));
                     return;
                 }
             }
 
             // Улучшатель
-            if (!this.checkCreeps(otherConstants.roleNames.upgrader, currentEpoch.creepsCounts.upgrader)) {
-                roleCreepName = otherConstants.roleCreepNames.upgrader();
+            if (!this.checkCreeps(staticConstants.roleNames.upgrader, currentEpoch.creepsCounts.upgrader)) {
+                roleCreepName = staticConstants.roleCreepNames.upgrader();
                 if (this.checkSpawn(spawn, currentEpoch.creepsBodies.upgrader, roleCreepName)) {
-                    this.spawn(spawn, currentEpoch.creepsBodies.upgrader, roleCreepName, roleCreepUpgrader.initialMemory(spawn));
+                    this.spawn(spawn, currentEpoch.creepsBodies.upgrader, roleCreepName, roleCreepUpgrader.getInitialMemory(spawn));
                     return;
                 }
             }
 
             // Строитель
-            if (!this.checkCreeps(otherConstants.roleNames.builder, currentEpoch.creepsCounts.builder)) {
-                roleCreepName = otherConstants.roleCreepNames.builder();
+            if (!this.checkCreeps(staticConstants.roleNames.builder, currentEpoch.creepsCounts.builder)) {
+                roleCreepName = staticConstants.roleCreepNames.builder();
                 if (this.checkSpawn(spawn, currentEpoch.creepsBodies.builder, roleCreepName)) {
-                    this.spawn(spawn, currentEpoch.creepsBodies.builder, roleCreepName, roleCreepBuilder.initialMemory(spawn));
+                    this.spawn(spawn, currentEpoch.creepsBodies.builder, roleCreepName, roleCreepBuilder.getInitialMemory(spawn));
                     return;
                 }
             }
@@ -80,11 +80,11 @@ const roleStructureSpawn = {
                 console.log("Проверка возможности создания крипа " + creepName + " пройдена");
                 return true;
 
-            case -6:
+            case ERR_NOT_ENOUGH_ENERGY:
                 return false;
 
             default:
-                console.log("Проверка возможности создания крипа " + creepName + " не пройдена, код ошибки " + otherConstantsErrors.errorCodeToText(result));
+                console.log("Проверка возможности создания крипа " + creepName + " не пройдена, код ошибки " + staticErrors.errorCodeToText(result));
                 return false;
         }
     },
@@ -105,7 +105,7 @@ const roleStructureSpawn = {
                 break;
 
             default:
-                console.log("Создание крипа " + creepName + " запущено неуспешно, код ошибки " + otherConstantsErrors.errorCodeToText(result));
+                console.log("Создание крипа " + creepName + " запущено неуспешно, код ошибки " + staticErrors.errorCodeToText(result));
                 break;
         }
     },
@@ -115,14 +115,12 @@ const roleStructureSpawn = {
      * Очищает память крипов, которые погибли по любым причинам.
      */
     clearNonExistingCreepMemory: function() {
-        console.log("Начата очистка несуществующей памяти крипов");
         for (let creepName in Memory.creeps) {
             if (!Game.creeps[creepName]) {
                 console.log("Очистка несуществующей памяти крипов: " + creepName);
                 delete Memory.creeps[creepName];
             }
         }
-        console.log("Закончена очистка несуществующей памяти крипов");
     },
 };
 

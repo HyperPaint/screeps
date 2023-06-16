@@ -1,6 +1,6 @@
-const otherConstants = require("./other.constants");
-const otherVisual = require("./other.visual");
-const roleCreepHarvester = require("./role.creep.harvester");
+const libCreep = require("./lib.creep");
+const libCreepHighLevel = require("./lib.creep.highlevel");
+const staticConstants = require("./static.constants");
 
 const roleCreepBuilder = {
     /**
@@ -9,25 +9,27 @@ const roleCreepBuilder = {
      * @param {Creep} creep 
      */
     process: function(creep) {
-        // Если текущая задача строить
         if (creep.memory.building) {
-            // И ресурсы закончились
+            // Строить
             if (creep.store.getUsedCapacity(RESOURCE_ENERGY) == 0) {
-                // Не строить, добывать ресурсы
+                // И ресурсы закончились
                 creep.memory.building = false;
             } else {
+                // И ресурсы не закончились
                 this.buildAndRepair(creep);
             }
         }
-        // Если текущая задача добывать
         else {
-            // И ресурсы добыты
+            // Добывать
             if (creep.store.getFreeCapacity(RESOURCE_ENERGY) == 0) {
-                // Строить, не добывать ресурсы
+                // И ресурсы добыты
                 creep.memory.building = true;
             } else {
-                if (creep.memory.sourceId != undefined) {
-                    roleCreepHarvester.harvest(creep, Game.getObjectById(creep.memory.sourceId));
+                // И ресурсы не добыты
+                if (!libCreepHighLevel.spend(creep)) {
+                    // Не удалось взять со склада
+                    const targetId = creep.memory.sourceId;
+                    libCreep.harvest(creep, targetId);
                 }
             }
         }
@@ -39,7 +41,7 @@ const roleCreepBuilder = {
      * @param {StructureSpawn} spawn Спавн, в котором создаётся крип.
      * @returns {Memory} Возвращает объект памяти.
      */
-    initialMemory: function(spawn) {
+    getInitialMemory: function(spawn) {
         // Память роли, если не создана
         if (spawn.room.memory.builders == undefined) {
             spawn.room.memory.builders = {};
@@ -48,131 +50,38 @@ const roleCreepBuilder = {
         if (spawn.room.memory.builders.counter == undefined) {
             spawn.room.memory.builders.counter = 0;
         }
-        return { role: otherConstants.roleNames.builder, sourceId: roleCreepHarvester.initialSource(spawn.room, spawn.room.memory.builders.counter++) };
+        const sourceId = libCreep.getRandomSource(spawn.room, spawn.room.memory.builders.counter++);
+        const memory = {
+            role: staticConstants.roleNames.builder,
+            sourceId: sourceId,
+        };
+        return memory;
     },
 
-    buildExtensions: function(creep, constructionSites) {
-        let structures = _.filter(constructionSites, (object) => object.structureType == STRUCTURE_EXTENSION);
-        if (structures.length) {
-            let target = creep.pos.findClosestByRange(structures);
-
-            // Отнести
-            if (creep.build(target) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
-                otherVisual.setSuccess(creep.room.visual, target.pos);
-            }
-            return true;
-        } else {
-            return false;
-        }
-    },
-
-    buildRoads: function(creep, constructionSites) {
-        let structures = _.filter(constructionSites, (object) => object.structureType == STRUCTURE_ROAD);
-        if (structures.length) {
-            let target = creep.pos.findClosestByRange(structures);
-
-            // Отнести
-            if (creep.build(target) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
-                otherVisual.setSuccess(creep.room.visual, target.pos);
-            }
-            return true;
-        } else {
-            return false;
-        }
-    },
-
-    repairRoads: function(creep, buildings) {
-
-    },
-
-    buildWalls: function(creep, constructionSites) {
-        let structures = _.filter(constructionSites, (object) => object.structureType == STRUCTURE_WALL);
-        if (structures.length) {
-            let target = creep.pos.findClosestByRange(structures);
-
-            // Отнести
-            if (creep.build(target) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
-                otherVisual.setSuccess(creep.room.visual, target.pos);
-            }
-            return true;
-        } else {
-            return false;
-        }
-    },
-
-    repairWalls: function(creep, buildings) {
-
-    },
-
-    buildRamparts: function(creep, constructionSites) {
-        let structures = _.filter(constructionSites, (object) => object.structureType == STRUCTURE_RAMPART);
-        if (structures.length) {
-            let target = creep.pos.findClosestByRange(structures);
-            // Отнести
-            if (creep.build(target) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
-                otherVisual.setSuccess(creep.room.visual, target.pos);
-            }
-            return true;
-        } else {
-            return false;
-        }
-    },
-
-    buildTowers: function(creep, constructionSites) {
-        let structures = _.filter(constructionSites, (object) => object.structureType == STRUCTURE_TOWER);
-        if (structures.length) {
-            let target = creep.pos.findClosestByRange(structures);
-            // Отнести
-            if (creep.build(target) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
-                otherVisual.setSuccess(creep.room.visual, target.pos);
-            }
-            return true;
-        } else {
-            return false;
-        }
-    },
-
-    buildContainers: function(creep, constructionSites) {
-        let structures = _.filter(constructionSites, (object) => object.structureType == STRUCTURE_CONTAINER);
-        if (structures.length) {
-            let target = creep.pos.findClosestByRange(structures);
-            // Отнести
-            if (creep.build(target) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
-                otherVisual.setSuccess(creep.room.visual, target.pos);
-            }
-            return true;
-        } else {
-            return false;
-        }
-    },
-
-    /**
-     * Строить здания в текущей комнате.
-     * @param {Creep} creep Крип, который будет строить.
-     */
     buildAndRepair: function(creep) {
-        let structures = creep.room.find(FIND_CONSTRUCTION_SITES);
-        if (structures.length) {
-            if (this.buildExtensions(creep, structures)) {
-                return;
-            }
-            else if (this.buildContainers(creep, structures)) {
-                return;
-            }
-            else if (this.buildRoads(creep, structures)) {
-                return;
-            }
-            else if (this.buildWalls(creep, structures)) {
-                return;
-            }
-        }
-    }
+        if (libCreepHighLevel.repair(creep, FIND_MY_SPAWNS, STRUCTURE_SPAWN)) return true;
+        if (libCreepHighLevel.repair(creep, FIND_MY_STRUCTURES, STRUCTURE_EXTENSION)) return true;
+        if (libCreepHighLevel.repair(creep, FIND_MY_STRUCTURES, STRUCTURE_TOWER)) return true;
+        if (libCreepHighLevel.repair(creep, FIND_MY_STRUCTURES, STRUCTURE_CONTAINER)) return true;
+        if (libCreepHighLevel.repair(creep, FIND_MY_STRUCTURES, STRUCTURE_STORAGE)) return true;
+
+        if (libCreepHighLevel.repair(creep, FIND_MY_STRUCTURES, STRUCTURE_RAMPART)) return true;
+        if (libCreepHighLevel.repair(creep, FIND_MY_STRUCTURES, STRUCTURE_WALL)) return true;
+        if (libCreepHighLevel.repair(creep, FIND_MY_STRUCTURES, STRUCTURE_ROAD)) return true;
+
+        if (libCreepHighLevel.build(creep, FIND_MY_CONSTRUCTION_SITES, STRUCTURE_SPAWN)) return true;
+        if (libCreepHighLevel.build(creep, FIND_MY_CONSTRUCTION_SITES, STRUCTURE_EXTENSION)) return true;
+        if (libCreepHighLevel.build(creep, FIND_MY_CONSTRUCTION_SITES, STRUCTURE_TOWER)) return true;
+        if (libCreepHighLevel.build(creep, FIND_MY_CONSTRUCTION_SITES, STRUCTURE_CONTAINER)) return true;
+        if (libCreepHighLevel.build(creep, FIND_MY_CONSTRUCTION_SITES, STRUCTURE_STORAGE)) return true;
+
+        if (libCreepHighLevel.build(creep, FIND_MY_CONSTRUCTION_SITES, STRUCTURE_RAMPART)) return true;
+        if (libCreepHighLevel.build(creep, FIND_MY_CONSTRUCTION_SITES, STRUCTURE_WALL)) return true;
+        if (libCreepHighLevel.build(creep, FIND_MY_CONSTRUCTION_SITES, STRUCTURE_ROAD)) return true;
+
+        libVisual.setError(creep.room.visual, creep.pos);
+        return false;
+    },
 };
 
 module.exports = roleCreepBuilder;

@@ -1,4 +1,4 @@
-const otherConstantsErrors = {
+const staticErrors = {
     /**
      * Функция для преобразования кода ошибки в текстовую константу.
      * @param {Number} errorCode Код ошибки.
@@ -57,4 +57,4 @@ const otherConstantsErrors = {
     }
 };
 
-module.exports = otherConstantsErrors;
+module.exports = staticErrors;
