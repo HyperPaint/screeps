@@ -1,3 +1,5 @@
+const staticRoom = require("./static.room");
+
 const staticEpoch = {   
     /**
      * Объект представляющий эпоху.
@@ -41,6 +43,9 @@ const staticEpoch = {
      * @returns {Epoch} Возвращает массив эпох соответствующий текущей комнате.
      */
     getEpochs: function(room) {
+        if (room.memory.sources == undefined) {
+            staticRoom.memorySources(room);
+        }
         const sourcesCount = room.memory.sources.count;
         /**
          * @type {Epoch[]} Массив эпох для текущей комнаты.
