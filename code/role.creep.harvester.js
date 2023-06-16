@@ -3,7 +3,7 @@ const libCreepHighLevel = require("./lib.creep.highlevel");
 const libVisual = require("./lib.visual");
 const staticConstants = require("./static.constants");
 
-module.exports = {
+const roleCreepHarvester = {
     /**
      * Функция для работы крипов.
      * Должна вызываться каждый тик.
@@ -66,3 +66,5 @@ module.exports = {
         return false;
     },
 };
+
+module.exports = roleCreepHarvester;
