@@ -42,9 +42,9 @@ const libVisual = {
     /* Стили пути */
 
     defaulPathStyle: { stroke: '#fff' },
-    redPathStyle: { stroke: '#f00' }, // Для атаки
-    greenPathStyle: { stroke: '#0f0' }, // Для лечения
-    bluePathStyle: { stroke: '#00f' }, // Для работы с контроллером
+    redPathStyle: { opacity: 0.33, stroke: '#f00' }, // Для атаки
+    greenPathStyle: { opacity: 0.33, stroke: '#0f0' }, // Для лечения
+    bluePathStyle: { opacity: 0.33, stroke: '#00f' }, // Для работы с контроллером
 
     /**
      * Установить метку успеха.
