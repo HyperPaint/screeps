@@ -1,6 +1,10 @@
+const libVisual = require("./lib.visual");
+const roleCreepBuilder = require("./role.creep.builder");
 const roleCreepHarvester = require("./role.creep.harvester");
 const roleCreepUpgrader = require("./role.creep.upgrader");
-const otherConstants = require("./other.constants");
+const staticConstants = require("./static.constants");
+const staticEpoch = require("./static.epoch");
+const staticErrors = require("./static.errors");
 
 const roleStructureSpawn = {
     /**
@@ -11,100 +15,98 @@ const roleStructureSpawn = {
     process: function(spawn) {
         if (spawn.spawning) {
             // Если спавн работает, отобразить текст работы
-            let creep = spawn.spawning;
-            spawn.room.visual.text("🛠️" + creep.name + "🛠️", spawn.pos.x, spawn.pos.y + 1.5);
+            const creep = spawn.spawning;
+            libVisual.setSpawnWorking(creep.name, spawn.room.visual, spawn.pos);
         } else {
             // Иначе попытаться поставить в очередь задачи
-            if (!this.check(otherConstants.roleNames.harvester, this.getEpoch(spawn).creepCounts.harvester)) { // Добытчик
-                this.spawn(spawn, otherConstants.epochs[0].creepBodies.harvester, otherConstants.roleCreepNames.harvester(), roleCreepHarvester.initialMemory(spawn));
-            } else if (!this.check(otherConstants.roleNames.upgrader, otherConstants.epochs[0].creepCounts.upgrader)) { // Улучшатель
-                this.spawn(spawn, otherConstants.epochs[0].creepBodies.upgrader, otherConstants.roleCreepNames.upgrader(), roleCreepUpgrader.initialMemory(spawn));
+            let currentEpoch = staticEpoch.getEpoch(spawn.room), roleCreepName;
+
+            // Добытчик
+            if (!this.checkCreeps(staticConstants.roleNames.harvester, currentEpoch.creepsCounts.harvester)) {
+                roleCreepName = staticConstants.roleCreepNames.harvester();
+                if (this.checkSpawn(spawn, currentEpoch.creepsBodies.harvester, roleCreepName)) {
+                    this.spawn(spawn, currentEpoch.creepsBodies.harvester, roleCreepName, roleCreepHarvester.getInitialMemory(spawn));
+                    return;
+                }
+            }
+
+            // Улучшатель
+            if (!this.checkCreeps(staticConstants.roleNames.upgrader, currentEpoch.creepsCounts.upgrader)) {
+                roleCreepName = staticConstants.roleCreepNames.upgrader();
+                if (this.checkSpawn(spawn, currentEpoch.creepsBodies.upgrader, roleCreepName)) {
+                    this.spawn(spawn, currentEpoch.creepsBodies.upgrader, roleCreepName, roleCreepUpgrader.getInitialMemory(spawn));
+                    return;
+                }
+            }
+
+            // Строитель
+            if (!this.checkCreeps(staticConstants.roleNames.builder, currentEpoch.creepsCounts.builder)) {
+                roleCreepName = staticConstants.roleCreepNames.builder();
+                if (this.checkSpawn(spawn, currentEpoch.creepsBodies.builder, roleCreepName)) {
+                    this.spawn(spawn, currentEpoch.creepsBodies.builder, roleCreepName, roleCreepBuilder.getInitialMemory(spawn));
+                    return;
+                }
             }
         }
     },
 
     /**
-     * Функция для вычисления уровня развития текущей комнаты.
-     * Уровень развития вычисляется раз в несколько вызовов, обычно возвращается закэшированное значение.
-     * @param {StructureSpawn} spawn Спавн в комнате которого трубуется вычислить уровень развития.
-     * @return {Epoch} Возвращает объект эпохи соответствующий текущему развитию.
+     * Функция проверяет соответствие текущему количества крипов заявленному количеству.
+     * @param {String} role Роль крипов для проверки
+     * @param {Number} creepsCount Заявленное количество крипов текущей роли
+     * @return {Boolean} Возвращает true, если текущее количество больше или соответствует заявленному. Возвращает false, если это не так.
      */
-    getEpoch: (spawn) => {
-        return otherConstants.epochs[0];
+    checkCreeps: function(role, creepsCount) {
+        let currentCreeps = _.filter(Game.creeps, (creep) => creep.memory.role == role);
+        // Текущее количество меньше заявленного
+        if (currentCreeps.length >= creepsCount) {
+            return true;
+        } else {
+            return false;
+        }
     },
 
     /**
-     * Функция проверяет соответствие текущему количества крипов заявленному количеству.
-     * @param {String} role Роль крипов для проверки
-     * @param {Number} count Заявленное количество крипов текущей роли
-     * @return {Boolean} Возвращает true, если текущее количество больше или соответствует заявленному. Возвращает false, если это не так.
+     * Функция проверяет возможность создания крипа.
+     * @param {StructureSpawn} spawn Спавн, в котором будет создан крип.
+     * @param {Number[]} creepBody Тело крипа.
+     * @param {String} creepName Наименование крипа.
+     * @return {Boolean} Возвращает true, если спавн возможен. Возвращает false, если это не так.
      */
-    check: function(role, count) {
-        let currentCreeps = _.filter(Game.creeps, (creep) => creep.memory.role == role);
-        // Текущее количество меньше заявленного
-        if (currentCreeps.length < count) {
-            return false;
-        } else {
-            return true;
+    checkSpawn: function(spawn, creepBody, creepName) {
+        let result = spawn.spawnCreep(creepBody, creepName, { dryRun: true });
+        switch (result) {
+            case OK:
+                console.log("Проверка возможности создания крипа " + creepName + " пройдена");
+                return true;
+
+            case ERR_NOT_ENOUGH_ENERGY:
+                return false;
+
+            default:
+                console.log("Проверка возможности создания крипа " + creepName + " не пройдена, код ошибки " + staticErrors.errorCodeToText(result));
+                return false;
         }
     },
 
     /**
      * Функция создаёт крипа, если это возможно.
      * @param {StructureSpawn} spawn Спавн, в котором будет создан крип.
-     * @param {Number[]} body Тело крипа.
-     * @param {String} name Наименование крипа.
-     * @param {Memory} memory Память крипа.
+     * @param {Number[]} creepBody Тело крипа.
+     * @param {String} creepName Наименование крипа.
+     * @param {Memory} creepMemory Память крипа.
     **/
-    spawn: function(spawn, body, name, memory) {
-        let result = spawn.spawnCreep(body, name, { dryRun: true });
-        if (result == OK) {
-            console.log("Проверка возможности создания крипа " + name + " пройдена");
-            this.clearNonExistingCreepMemory();
-            if (spawn.spawnCreep(body, name, { memory: memory }) == OK) {
-                console.log("Создание крипа " + name);
-            }
-        } else {
-            switch (result) {
-                // The operation has been scheduled successfully
-                case OK:
-                    console.log("Проверка возможности создания крипа " + name + " не пройдена, код ошибки OK");
-                    break;
+    spawn: function(spawn, creepBody, creepName, creepMemory) {
+        this.clearNonExistingCreepMemory();
+        let result = spawn.spawnCreep(creepBody, creepName, { memory: creepMemory });
+        switch (result) {
+            case OK:
+                console.log("Создание крипа " + creepName + " запущено успешно");
+                break;
 
-                // You are not the owner of this spawn
-                case ERR_NOT_OWNER:
-                    console.log("Проверка возможности создания крипа " + name + " не пройдена, код ошибки ERR_NOT_OWNER");
-                    break;
-
-                // There is a creep with the same name already
-                case ERR_NAME_EXISTS:
-                    console.log("Проверка возможности создания крипа " + name + " не пройдена, код ошибки ERR_NAME_EXISTS");
-                    break;
-
-                // The spawn is already in process of spawning another creep
-                case ERR_BUSY:
-                    console.log("Проверка возможности создания крипа " + name + " не пройдена, код ошибки ERR_BUSY");
-                    break;
-
-                // The spawn and its extensions contain not enough energy to create a creep with the given body
-                case ERR_NOT_ENOUGH_ENERGY:
-                    //console.log("Проверка возможности создания крипа " + name + " не пройдена, код ошибки ERR_NOT_ENOUGH_ENERGY");
-                    break;
-
-                // Body is not properly described or name was not provided
-                case ERR_INVALID_ARGS:
-                    console.log("Проверка возможности создания крипа " + name + " не пройдена, код ошибки ERR_INVALID_ARGS");
-                    break;
-
-                // Your Room Controller level is insufficient to use this spawn
-                case ERR_RCL_NOT_ENOUGH:
-                    console.log("Проверка возможности создания крипа " + name + " не пройдена, код ошибки ERR_RCL_NOT_ENOUGH");
-                    break;
-
-                default:
-                    console.log("Проверка возможности создания крипа " + name + " не пройдена, код ошибки " + result);
-                    break;
-            }
+            default:
+                console.log("Создание крипа " + creepName + " запущено неуспешно, код ошибки " + staticErrors.errorCodeToText(result));
+                break;
         }
     },
 
