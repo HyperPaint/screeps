@@ -1,5 +1,6 @@
 const libCreep = require("./lib.creep");
 const libCreepHighLevel = require("./lib.creep.highlevel");
+const libVisual = require("./lib.visual");
 const staticConstants = require("./static.constants");
 
 const roleCreepBuilder = {
@@ -16,7 +17,11 @@ const roleCreepBuilder = {
                 creep.memory.building = false;
             } else {
                 // И ресурсы не закончились
-                this.buildAndRepair(creep);
+                if(!this.buildAndRepair(creep)) {
+                    if(!libCreep.upgradeController(creep)) {
+                        libVisual.setError(creep.room.visual, creep.pos);
+                    }
+                }
             }
         }
         else {
@@ -62,12 +67,12 @@ const roleCreepBuilder = {
         if (libCreepHighLevel.repair(creep, FIND_MY_SPAWNS, STRUCTURE_SPAWN)) return true;
         if (libCreepHighLevel.repair(creep, FIND_MY_STRUCTURES, STRUCTURE_EXTENSION)) return true;
         if (libCreepHighLevel.repair(creep, FIND_MY_STRUCTURES, STRUCTURE_TOWER)) return true;
-        if (libCreepHighLevel.repair(creep, FIND_MY_STRUCTURES, STRUCTURE_CONTAINER)) return true;
+        if (libCreepHighLevel.repair(creep, FIND_STRUCTURES, STRUCTURE_CONTAINER)) return true;
         if (libCreepHighLevel.repair(creep, FIND_MY_STRUCTURES, STRUCTURE_STORAGE)) return true;
 
         if (libCreepHighLevel.repair(creep, FIND_MY_STRUCTURES, STRUCTURE_RAMPART)) return true;
-        if (libCreepHighLevel.repair(creep, FIND_MY_STRUCTURES, STRUCTURE_WALL)) return true;
-        if (libCreepHighLevel.repair(creep, FIND_MY_STRUCTURES, STRUCTURE_ROAD)) return true;
+        if (libCreepHighLevel.repair(creep, FIND_STRUCTURES, STRUCTURE_WALL, 0.000016667)) return true;
+        if (libCreepHighLevel.repair(creep, FIND_STRUCTURES, STRUCTURE_ROAD)) return true;
 
         if (libCreepHighLevel.build(creep, FIND_MY_CONSTRUCTION_SITES, STRUCTURE_SPAWN)) return true;
         if (libCreepHighLevel.build(creep, FIND_MY_CONSTRUCTION_SITES, STRUCTURE_EXTENSION)) return true;
@@ -79,7 +84,6 @@ const roleCreepBuilder = {
         if (libCreepHighLevel.build(creep, FIND_MY_CONSTRUCTION_SITES, STRUCTURE_WALL)) return true;
         if (libCreepHighLevel.build(creep, FIND_MY_CONSTRUCTION_SITES, STRUCTURE_ROAD)) return true;
 
-        libVisual.setError(creep.room.visual, creep.pos);
         return false;
     },
 };

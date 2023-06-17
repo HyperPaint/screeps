@@ -11,7 +11,7 @@ const libCreepHighLevel = {
     store: function(creep, findStructures, filterStructuresType) {
         // Найти структуры
         const structures = _.filter(creep.room.find(findStructures), (object) => object.structureType == filterStructuresType);
-        // Найти свободные
+        // Свободные
         const notFilled = _.filter(structures, (object) => object.store.getFreeCapacity(RESOURCE_ENERGY) > 0);
         if (notFilled.length) {
             // Есть свободные
@@ -40,7 +40,7 @@ const libCreepHighLevel = {
     spend: function(creep, findStructures, filterStructuresType) {
         // Найти структуры
         const structures = _.filter(creep.room.find(findStructures), (object) => object.structureType == filterStructuresType);
-        // Найти не пустые
+        // Не пустые
         const notFilled = _.filter(structures, (object) => object.store.getUsedCapacity(RESOURCE_ENERGY) > 0);
         if (notFilled.length) {
             // Есть не пустые
@@ -88,24 +88,31 @@ const libCreepHighLevel = {
 
     /**
      * Функция для починки крипом определённых строений.
-     * @param {Creep} creep Крип для починки ресурсов.
+     * @param {Creep} creep Крип для починки ресурсов.creep.room.find(findStructures)
      * @param {Number} findStructures Структуры, которые следует искать.
      * @param {Number} filterStructuresType Тип структур, которые следует отфильтровать от искомых.
+     * @param {Number} hitsLimit Число от 0.0 до 1.0, определяющее лимит, когда действие нужно пропускать.
      * @returns {Boolean} Возвращает true, если удалось выполнить действие, false, если нет.
      */
-    repair: function(creep, findStructures, filterStructuresType) {
+    repair: function(creep, findStructures, filterStructuresType, hitsLimit = 0) {
         // Найти структуры
         const structures = _.filter(creep.room.find(findStructures), (object) => object.structureType == filterStructuresType);
-        const needRepair = _.filter(creep.room.find(findStructures), (object) => object.hits != object.hitsMax);
+        // Требующие починки
+        let needRepair 
+        if (hitsLimit) {
+            needRepair = _.filter(structures, (object) => (object.hits / object.hitsMax) < hitsLimit);
+        } else {
+            needRepair = _.filter(structures, (object) => object.hits < object.hitsMax);
+        }
         if (needRepair.length) {
             // Есть структуры
             let target;
-            if (structures.length == 1) {
+            if (needRepair.length == 1) {
                 // Единственная
-                target = structures[0];
+                target = needRepair[0];
             } else {
                 // Наиболее поломанная
-                target = structures.reduce((prev, next) => prev.progress < next.progress ? prev : next);
+                target = needRepair.reduce((prev, next) => prev.hits < next.hits ? prev : next);
             }
             return libCreep.repair(creep, target.id);
         } else {

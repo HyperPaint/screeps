@@ -27,7 +27,11 @@ const roleCreepHarvester = {
                 creep.memory.harvesting = true;
             } else {
                 // И ресурсы не закончились
-                this.store(creep);
+                if(!this.store(creep)) {
+                    if(!libCreep.upgradeController(creep)) {
+                        libVisual.setError(creep.room.visual, creep.pos);
+                    }
+                }
             }
         }
     },
@@ -59,10 +63,9 @@ const roleCreepHarvester = {
         if (libCreepHighLevel.store(creep, FIND_MY_SPAWNS, STRUCTURE_SPAWN)) return true;
         if (libCreepHighLevel.store(creep, FIND_MY_STRUCTURES, STRUCTURE_EXTENSION)) return true;
         if (libCreepHighLevel.store(creep, FIND_MY_STRUCTURES, STRUCTURE_TOWER)) return true;
-        if (libCreepHighLevel.store(creep, FIND_MY_STRUCTURES, STRUCTURE_CONTAINER)) return true;
+        if (libCreepHighLevel.store(creep, FIND_STRUCTURES, STRUCTURE_CONTAINER)) return true;
         if (libCreepHighLevel.store(creep, FIND_MY_STRUCTURES, STRUCTURE_STORAGE)) return true;
 
-        libVisual.setError(creep.room.visual, creep.pos);
         return false;
     },
 };
