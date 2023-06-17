@@ -61,7 +61,7 @@ const libCreepHighLevel = {
 
     /**
      * Функция для строительства крипом определённых строений.
-     * @param {Creep} creep Крип для строительства ресурсов.
+     * @param {Creep} creep Крип для строительства.
      * @param {Number} findStructures Структуры, которые следует искать.
      * @param {Number} filterStructuresType Тип структур, которые следует отфильтровать от искомых.
      * @returns {Boolean} Возвращает true, если удалось выполнить действие, false, если нет.
@@ -88,7 +88,7 @@ const libCreepHighLevel = {
 
     /**
      * Функция для починки крипом определённых строений.
-     * @param {Creep} creep Крип для починки ресурсов.creep.room.find(findStructures)
+     * @param {Creep} creep Крип для починки.
      * @param {Number} findStructures Структуры, которые следует искать.
      * @param {Number} filterStructuresType Тип структур, которые следует отфильтровать от искомых.
      * @param {Number} hitsLimit Число от 0.0 до 1.0, определяющее лимит, когда действие нужно пропускать.
@@ -98,7 +98,7 @@ const libCreepHighLevel = {
         // Найти структуры
         const structures = _.filter(creep.room.find(findStructures), (object) => object.structureType == filterStructuresType);
         // Требующие починки
-        let needRepair 
+        let needRepair;
         if (hitsLimit) {
             needRepair = _.filter(structures, (object) => (object.hits / object.hitsMax) < hitsLimit);
         } else {

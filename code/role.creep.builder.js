@@ -31,7 +31,7 @@ const roleCreepBuilder = {
                 creep.memory.building = true;
             } else {
                 // И ресурсы не добыты
-                if (!libCreepHighLevel.spend(creep)) {
+                if (!this.spend(creep)) {
                     // Не удалось взять со склада
                     const targetId = creep.memory.sourceId;
                     libCreep.harvest(creep, targetId);
@@ -61,6 +61,12 @@ const roleCreepBuilder = {
             sourceId: sourceId,
         };
         return memory;
+    },
+
+    spend: function(creep) {
+        if (libCreepHighLevel.spend(creep, FIND_STRUCTURES, STRUCTURE_CONTAINER)) return true;
+        if (libCreepHighLevel.spend(creep, FIND_MY_STRUCTURES, STRUCTURE_STORAGE)) return true;
+        return false;
     },
 
     buildAndRepair: function(creep) {

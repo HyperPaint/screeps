@@ -37,7 +37,7 @@ const libCreep = {
 
             default:
                 console.log(staticStrings.console.creepCannotAttack(creep, targetId, result));
-                libVisual.setError(creep.room.visual, target.pos);
+                libVisual.setError(creep.room.visual, creep.pos);
                 return false;
         }
     },
@@ -62,7 +62,7 @@ const libCreep = {
 
             default:
                 console.log(staticStrings.console.creepCannotAttack(creep, targetId, result));
-                libVisual.setError(creep.room.visual, target.pos);
+                libVisual.setError(creep.room.visual, creep.pos);
                 return false;
         }
     },
@@ -90,7 +90,7 @@ const libCreep = {
 
             default:
                 console.log(staticStrings.console.creepCannotBuild(creep, targetId, result));
-                libVisual.setError(creep.room.visual, target.pos);
+                libVisual.setError(creep.room.visual, creep.pos);
                 return false;
         }
     },
@@ -113,7 +113,7 @@ const libCreep = {
 
             default:
                 console.log(staticStrings.console.creepCannotClaimController(creep, targetId, result));
-                libVisual.setError(creep.room.visual, target.pos);
+                libVisual.setError(creep.room.visual, creep.pos);
                 return false;
         }
     },
@@ -137,7 +137,7 @@ const libCreep = {
 
             default:
                 console.log(staticStrings.console.creepCannotDismatle(creep, targetId, result));
-                libVisual.setError(creep.room.visual, target.pos);
+                libVisual.setError(creep.room.visual, creep.pos);
                 return false;
         }
     },
@@ -160,7 +160,7 @@ const libCreep = {
 
             default:
                 console.log(staticStrings.console.creepCannotGenerateSafeMode(creep, targetId, result));
-                libVisual.setError(creep.room.visual, target.pos);
+                libVisual.setError(creep.room.visual, creep.pos);
                 return false;
         }
     },
@@ -189,7 +189,7 @@ const libCreep = {
 
             default:
                 console.log(staticStrings.console.creepCannotHarvest(creep, targetId, result));
-                libVisual.setError(creep.room.visual, target.pos);
+                libVisual.setError(creep.room.visual, creep.pos);
                 return false;
         }
     },
@@ -214,7 +214,7 @@ const libCreep = {
 
             default:
                 console.log(staticStrings.console.creepCannotHeal(creep, targetId, result));
-                libVisual.setError(creep.room.visual, target.pos);
+                libVisual.setError(creep.room.visual, creep.pos);
                 return false;
         }
     },
@@ -242,7 +242,7 @@ const libCreep = {
 
             default:
                 console.log(staticStrings.console.creepCannotPickup(creep, targetId, result));
-                libVisual.setError(creep.room.visual, target.pos);
+                libVisual.setError(creep.room.visual, creep.pos);
                 return false;
         }
     },
@@ -279,7 +279,7 @@ const libCreep = {
 
             default:
                 console.log(staticStrings.console.creepCannotAttack(creep, targetId, result));
-                libVisual.setError(creep.room.visual, target.pos);
+                libVisual.setError(creep.room.visual, creep.pos);
                 return false;
         }
     },
@@ -292,7 +292,7 @@ const libCreep = {
      */
     rangedHeal: function(creep, targetId) {
         const target = Game.getObjectById(targetId);
-        const result = creep.heal(target);
+        const result = creep.rangedHeal(target);
         switch (result) {
             case ERR_NOT_IN_RANGE:
                 // Атака требует максимально скоординированных действий
@@ -304,7 +304,7 @@ const libCreep = {
 
             default:
                 console.log(staticStrings.console.creepCannotHeal(creep, targetId, result));
-                libVisual.setError(creep.room.visual, target.pos);
+                libVisual.setError(creep.room.visual, creep.pos);
                 return false;
         }
     },
@@ -332,7 +332,7 @@ const libCreep = {
 
             default:
                 console.log(staticStrings.console.creepCannotRepair(creep, targetId, result));
-                libVisual.setError(creep.room.visual, target.pos);
+                libVisual.setError(creep.room.visual, creep.pos);
                 return false;
         }
     },
@@ -393,7 +393,7 @@ const libCreep = {
 
             default:
                 console.log(staticStrings.console.creepCannotTransfer(creep, targetId, result));
-                libVisual.setError(creep.room.visual, target.pos);
+                libVisual.setError(creep.room.visual, creep.pos);
                 return false;
         }
     },
@@ -420,7 +420,7 @@ const libCreep = {
 
             default:
                 console.log(staticStrings.console.creepCannotUpgradeController(creep, target.id, result));
-                libVisual.setError(creep.room.visual, target.pos);
+                libVisual.setError(creep.room.visual, creep.pos);
                 return false;
         }
     },
@@ -459,7 +459,7 @@ const libCreep = {
 
             default:
                 console.log(staticStrings.console.creepCannotWithdraw(creep, targetId, result));
-                libVisual.setError(creep.room.visual, target.pos);
+                libVisual.setError(creep.room.visual, creep.pos);
                 return false;
         }
     }

@@ -59,7 +59,7 @@ const roleCreepUpgrader = {
     },
 
     spend: function(creep) {
-        if (libCreepHighLevel.spend(creep, FIND_MY_STRUCTURES, STRUCTURE_CONTAINER)) return true;
+        if (libCreepHighLevel.spend(creep, FIND_STRUCTURES, STRUCTURE_CONTAINER)) return true;
         if (libCreepHighLevel.spend(creep, FIND_MY_STRUCTURES, STRUCTURE_STORAGE)) return true;
         return false;
     },

@@ -40,7 +40,6 @@ const libVisual = {
     withdrawStyle: { color: "white", backgroundColor: "#00000000", opacity: 1.0 },
 
     /* Стили пути */
-
     defaulPathStyle: { stroke: '#fff' },
     redPathStyle: { opacity: 0.33, stroke: '#f00' }, // Для атаки
     greenPathStyle: { opacity: 0.33, stroke: '#0f0' }, // Для лечения

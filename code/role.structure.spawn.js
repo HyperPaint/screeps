@@ -59,10 +59,10 @@ const roleStructureSpawn = {
     checkCreeps: function(role, creepsCount) {
         let currentCreeps = _.filter(Game.creeps, (creep) => creep.memory.role == role);
         // Текущее количество меньше заявленного
-        if (currentCreeps.length < creepsCount) {
-            return false;
-        } else {
+        if (currentCreeps.length >= creepsCount) {
             return true;
+        } else {
+            return false;
         }
     },
 
