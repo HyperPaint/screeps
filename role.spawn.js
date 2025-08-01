@@ -6,7 +6,7 @@ let roleSpawn = {
             room.memory = {
                 level: 1,
                 harvesters: sources * 1,
-                upgraders: sources * 2
+                upgraders: sources * 3
             }
         }
 
